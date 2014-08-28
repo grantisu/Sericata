@@ -13,6 +13,10 @@ class CoinBank(object):
     def balance(self):
         return float(self.svc.getbalance(self.acct))
 
+    @property
+    def public_address(self):
+        return self.svc.getaccountaddress(self.acct)
+
     def get_total_pending(self):
         return sum(self.pending.values())
 
@@ -20,8 +24,14 @@ class CoinBank(object):
         return self.balance - self.get_total_pending() - self.txfee
 
     def get_current_payout(self):
-        return self.ratio * self.get_available()
+        return min(self.ratio * self.get_available(), 1000)
 
+    def make_payment(self, addr):
+        if not self.svc.validateaddress(addr)['isvalid']:
+            raise ValueError
+        amt = self.get_current_payout()
+        txid = self.svc.sendfrom(self.acct, addr, amt)
+        return (amt, txid)
 
 def with_bank(orig_func):
     '''Function decorator to provide coinrpc bank'''
@@ -30,22 +40,33 @@ def with_bank(orig_func):
         bank = app.config['coinrpc.bank']
         return orig_func(bank, *arg, **kwarg)
     return wrapped_func
-    
-@bottle.get('/help')
-@with_bank
-def help(bank):
-    hdoc = bank.svc.help()
-    return hdoc.replace('\n', '<br>')
 
-@bottle.get('/current_payout')
+@bottle.get('/')
 @with_bank
-def get_balance(bank):
-    return str(bank.get_current_payout())
+def make_main_page(bank):
+    return """
+Donation address is: {}
+<br>
+Current payout is: {}
+<br>
+<form action="/payout" method="post">
+  Address: <input name="addr" type="text" />
+  <input value="payout" type="Submit">
+</form>
+""".format(bank.public_address, bank.get_current_payout())
 
-@bottle.get('/balance')
+@bottle.post('/payout')
 @with_bank
-def get_balance(bank):
-    return str(bank.balance)
+def attempt_payout(bank):
+    form = bottle.request.forms
+    addr = form.get('addr')
+    try:
+        amt, txid = bank.make_payment(addr)
+    except ValueError:
+        return bottle.HTTPResponse(status = 400, body = "Bad address: "+addr)
+
+    return "Sent {} in transaction '{}'".format(amt, txid)
+
 
 if __name__ == '__main__':
     app = bottle.default_app()
