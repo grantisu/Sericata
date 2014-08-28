@@ -1,17 +1,21 @@
 import bottle, jsonrpc, sys
 
-def with_rpc(orig_func):
-    '''Function decorator to provide RPC service proxy'''
-    def wrapped_func(*arg, **kwarg):
+def with_coinrpc(*items):
+    '''Function decorator to provide coinrpc config items'''
+    def wrap_func(orig_func):
         app = bottle.default_app()
-        svc = app.config['coinrpc.svc']
-        return orig_func(svc, *arg, **kwarg)
-    return wrapped_func
+        keys = tuple(['coinrpc.' + i for i in items])
+        def wrapped_func(*arg, **kwarg):
+            config_items = tuple([app.config[k] for k in keys])
+            arg = config_items + arg
+            return orig_func(*arg, **kwarg)
+        return wrapped_func
+    return wrap_func
     
 @bottle.get('/help')
-@with_rpc
-def help(rpc):
-    hdoc = rpc.help()
+@with_coinrpc('svc')
+def help(svc):
+    hdoc = svc.help()
     return hdoc.replace('\n', '<br>')
 
 if __name__ == '__main__':
