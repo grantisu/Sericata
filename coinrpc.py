@@ -1,6 +1,9 @@
-from gevent import monkey; monkey.patch_all()
+from gevent import Greenlet, monkey, core; monkey.patch_all()
 
 import bottle, jsonrpc, sys
+
+class DuplicateKeyError(Exception):
+    pass
 
 class CoinBank(object):
     def __init__(self, config):
@@ -8,8 +11,12 @@ class CoinBank(object):
         self.svc   = config['coinrpc.svc']
         self.ratio = float(config['coinrpc.ratio'])
         self.txfee = float(config['coinrpc.txfee'])
+        self.interval  = float(config['coinrpc.interval'])
 
+        self.next_payout = core.time() + self.interval
         self.pending = {}
+        self.paid = [(0,0)]
+        self.making_payment = False
 
     @property
     def balance(self):
@@ -28,12 +35,25 @@ class CoinBank(object):
     def get_current_payout(self):
         return min(self.ratio * self.get_available(), 1000)
 
-    def make_payment(self, addr):
+    def get_pay_status(self):
+        '''This method should be greenthread-atomic'''
+        return (len(self.paid), sum(self.pending.values()))
+
+    def schedule_payment(self, addr):
         if not self.svc.validateaddress(addr)['isvalid']:
             raise ValueError
-        amt = self.get_current_payout()
-        txid = self.svc.sendfrom(self.acct, addr, amt)
-        return (amt, txid)
+        if addr in self.pending:
+            raise DuplicateKeyError
+
+        while 1:
+            pay_status = self.get_pay_status()
+            amt = self.get_current_payout()
+            # Check to make sure nothing happened
+            if pay_status == self.get_pay_status():
+                break
+
+        self.pending[addr] = amt
+        return amt
 
 def with_bank(orig_func):
     '''Function decorator to provide coinrpc bank'''
@@ -42,6 +62,21 @@ def with_bank(orig_func):
         bank = app.config['coinrpc.bank']
         return orig_func(bank, *arg, **kwarg)
     return wrapped_func
+
+@with_bank
+def make_payments(bank):
+
+    amt = bank.get_total_pending()
+    Greenlet.spawn_later(bank.interval, globals()['make_payments'])
+
+    if amt == 0:
+        return False
+
+    to_pay = bank.pending
+    bank.pending = {}
+    bank.paid += [(core.time(), amt)]
+
+    bank.svc.sendmany(bank.acct, to_pay)
 
 @bottle.get('/')
 @with_bank
@@ -68,11 +103,15 @@ Available funds are: {}
 Current payout is: {}
 <br>
 Total pending payouts are: {}
+<br>
+Last payout was on {} for {}
 """.format(
     bank.public_address,
     bank.get_available(),
     bank.get_current_payout(),
     bank.get_total_pending(),
+    bank.paid[-1][0],
+    bank.paid[-1][1],
 )
 
 @bottle.post('/payout')
@@ -81,11 +120,13 @@ def attempt_payout(bank):
     form = bottle.request.forms
     addr = form.get('addr')
     try:
-        amt, txid = bank.make_payment(addr)
+        amt = bank.schedule_payment(addr)
     except ValueError:
         return bottle.HTTPResponse(status = 400, body = "Bad address: "+addr)
+    except DuplicateKeyError:
+        return bottle.HTTPResponse(status = 400, body = addr+" already queued")
 
-    return "Sent {} in transaction '{}'".format(amt, txid)
+    return "Scheduled {} to {}".format(amt, addr)
 
 
 if __name__ == '__main__':
@@ -116,4 +157,6 @@ if __name__ == '__main__':
     for key, val in config.items():
         if '.' not in key and key not in ('catchall','autojson'):
             gevent_conf[key] = val
+
+    Greenlet.spawn_later(bank.interval, make_payments)
     app.run(**gevent_conf)
