@@ -1,3 +1,5 @@
+from gevent import monkey; monkey.patch_all()
+
 import bottle, jsonrpc, sys
 
 class CoinBank(object):
@@ -90,4 +92,10 @@ if __name__ == '__main__':
     bank = CoinBank(config)
     config['coinrpc.bank'] = bank
 
-    app.run(**config)
+    # GeventServer is more fragile than the default WSGIRefServer: extra
+    # arguments must be filtered out of config
+    gevent_conf = {'server': 'gevent'}
+    for key, val in config.items():
+        if '.' not in key and key not in ('catchall','autojson'):
+            gevent_conf[key] = val
+    app.run(**gevent_conf)
