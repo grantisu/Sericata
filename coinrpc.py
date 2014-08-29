@@ -49,7 +49,10 @@ class CoinBank(object):
         return sum(self.pending.values())
 
     def get_available(self):
-        return self.balance - self.get_total_pending() - self.txfee
+        net = self.balance - self.get_total_pending() - self.txfee
+        if net < 0:
+            net = 0
+        return net
 
     def get_current_payout(self):
         return min(self.ratio * self.get_available(), 1000)
