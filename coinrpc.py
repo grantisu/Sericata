@@ -13,11 +13,9 @@ class CoinBank(object):
         self.txfee = float(config['coinrpc.txfee'])
         self.interval  = float(config['coinrpc.interval'])
 
-        self.next_payout = core.time() + self.interval
         self.pending = {}
         self.paid = [(0,0)]
         self.pay_periods = 0
-        self.making_payment = False
 
         self._balance_stat = 0
         self._balance = self.balance
