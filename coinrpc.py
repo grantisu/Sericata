@@ -30,7 +30,7 @@ class CoinBank(object):
         svc = None
         while self._balance_stat != self.get_pay_status():
             if svc is None:
-                svc = jsonrpc.ServiceProxy(self.url)
+                svc = self.get_proxy()
             self._balance_stat = self.get_pay_status()
             self._balance = float(svc.getbalance(self.acct))
         return self._balance
@@ -40,10 +40,13 @@ class CoinBank(object):
         svc = None
         while self._public_address_stat != self.get_pay_status():
             if svc is None:
-                svc = jsonrpc.ServiceProxy(self.url)
+                svc = self.get_proxy()
             self._public_address_stat = self.get_pay_status()
             self._public_address = svc.getaccountaddress(self.acct)
         return self._public_address
+
+    def get_proxy(self):
+        return jsonrpc.ServiceProxy(self.url)
 
     def get_total_pending(self):
         return sum(self.pending.values())
@@ -62,7 +65,7 @@ class CoinBank(object):
         return (len(self.paid), sum(self.pending.values()), self.pay_periods)
 
     def schedule_payment(self, addr):
-        svc = jsonrpc.ServiceProxy(self.url)
+        svc = self.get_proxy()
         if not svc.validateaddress(addr)['isvalid']:
             raise ValueError
         if addr in self.pending:
@@ -96,7 +99,7 @@ def make_payments(bank):
     if amt == 0:
         return False
 
-    svc = jsonrpc.ServiceProxy(bank.url)
+    svc = bank.get_proxy()
     to_pay = bank.pending
     bank.pending = {}
     bank.paid += [(core.time(), amt)]
