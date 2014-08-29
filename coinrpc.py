@@ -18,15 +18,31 @@ class CoinBank(object):
         self.paid = [(0,0)]
         self.making_payment = False
 
+        self._balance_stat = 0
+        self._balance = self.balance
+
+        self._public_address_stat = 0
+        self._public_address = self.public_address
+
     @property
     def balance(self):
-        svc = jsonrpc.ServiceProxy(self.url)
-        return float(svc.getbalance(self.acct))
+        svc = None
+        while self._balance_stat != self.get_pay_status():
+            if svc is None:
+                svc = jsonrpc.ServiceProxy(self.url)
+            self._balance_stat = self.get_pay_status()
+            self._balance = float(svc.getbalance(self.acct))
+        return self._balance
 
     @property
     def public_address(self):
-        svc = jsonrpc.ServiceProxy(self.url)
-        return svc.getaccountaddress(self.acct)
+        svc = None
+        while self._public_address_stat != self.get_pay_status():
+            if svc is None:
+                svc = jsonrpc.ServiceProxy(self.url)
+            self._public_address_stat = self.get_pay_status()
+            self._public_address = svc.getaccountaddress(self.acct)
+        return self._public_address
 
     def get_total_pending(self):
         return sum(self.pending.values())
