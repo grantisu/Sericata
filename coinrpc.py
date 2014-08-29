@@ -16,6 +16,7 @@ class CoinBank(object):
         self.next_payout = core.time() + self.interval
         self.pending = {}
         self.paid = [(0,0)]
+        self.pay_periods = 0
         self.making_payment = False
 
         self._balance_stat = 0
@@ -55,7 +56,7 @@ class CoinBank(object):
 
     def get_pay_status(self):
         '''This method should be greenthread-atomic'''
-        return (len(self.paid), sum(self.pending.values()))
+        return (len(self.paid), sum(self.pending.values()), self.pay_periods)
 
     def schedule_payment(self, addr):
         svc = jsonrpc.ServiceProxy(self.url)
@@ -85,6 +86,7 @@ def with_bank(orig_func):
 @with_bank
 def make_payments(bank):
 
+    bank.pay_periods += 1
     amt = bank.get_total_pending()
     Greenlet.spawn_later(bank.interval, globals()['make_payments'])
 
@@ -124,12 +126,15 @@ Current payout is: {}
 <br>
 Total pending payouts are: {}
 <br>
+Total pay periods elapsed: {}
+<br>
 Last payout was on {} for {}
 """.format(
     bank.public_address,
     bank.get_available(),
     bank.get_current_payout(),
     bank.get_total_pending(),
+    bank.pay_periods,
     bank.paid[-1][0],
     bank.paid[-1][1],
 )
