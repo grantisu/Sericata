@@ -8,7 +8,7 @@ class DuplicateKeyError(Exception):
 class CoinBank(object):
     def __init__(self, config):
         self.acct  = config['coinrpc.acct']
-        self.svc   = config['coinrpc.svc']
+        self.url   = config['coinrpc.url']
         self.ratio = float(config['coinrpc.ratio'])
         self.txfee = float(config['coinrpc.txfee'])
         self.interval  = float(config['coinrpc.interval'])
@@ -20,11 +20,13 @@ class CoinBank(object):
 
     @property
     def balance(self):
-        return float(self.svc.getbalance(self.acct))
+        svc = jsonrpc.ServiceProxy(self.url)
+        return float(svc.getbalance(self.acct))
 
     @property
     def public_address(self):
-        return self.svc.getaccountaddress(self.acct)
+        svc = jsonrpc.ServiceProxy(self.url)
+        return svc.getaccountaddress(self.acct)
 
     def get_total_pending(self):
         return sum(self.pending.values())
@@ -40,7 +42,8 @@ class CoinBank(object):
         return (len(self.paid), sum(self.pending.values()))
 
     def schedule_payment(self, addr):
-        if not self.svc.validateaddress(addr)['isvalid']:
+        svc = jsonrpc.ServiceProxy(self.url)
+        if not svc.validateaddress(addr)['isvalid']:
             raise ValueError
         if addr in self.pending:
             raise DuplicateKeyError
@@ -72,11 +75,12 @@ def make_payments(bank):
     if amt == 0:
         return False
 
+    svc = jsonrpc.ServiceProxy(bank.url)
     to_pay = bank.pending
     bank.pending = {}
     bank.paid += [(core.time(), amt)]
 
-    bank.svc.sendmany(bank.acct, to_pay)
+    svc.sendmany(bank.acct, to_pay)
 
 @bottle.get('/')
 @with_bank
@@ -144,9 +148,7 @@ if __name__ == '__main__':
         config['coinrpc.host'],
         config['coinrpc.port'],
     )
-
-    svc = jsonrpc.ServiceProxy(url)
-    config['coinrpc.svc'] = svc
+    config['coinrpc.url'] = url
 
     bank = CoinBank(config)
     config['coinrpc.bank'] = bank
