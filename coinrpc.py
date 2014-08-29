@@ -16,6 +16,7 @@ class CoinBank(object):
         self.pending = {}
         self.paid = [(0,0)]
         self.pay_periods = 0
+        self.last_pay_time = core.time()
 
         self._balance_stat = 0
         self._balance = self.balance
@@ -91,6 +92,7 @@ def with_bank(orig_func):
 def make_payments(bank):
 
     bank.pay_periods += 1
+    bank.last_pay_time = core.time()
     amt = bank.get_total_pending()
     Greenlet.spawn_later(bank.interval, globals()['make_payments'])
 
