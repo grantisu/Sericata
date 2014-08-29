@@ -57,6 +57,24 @@ Current payout is: {}
 </form>
 """.format(bank.public_address, bank.get_current_payout())
 
+@bottle.get('/stats')
+@with_bank
+def make_stats_page(bank):
+    return """
+Donation address is: {}
+<br>
+Available funds are: {}
+<br>
+Current payout is: {}
+<br>
+Total pending payouts are: {}
+""".format(
+    bank.public_address,
+    bank.get_available(),
+    bank.get_current_payout(),
+    bank.get_total_pending(),
+)
+
 @bottle.post('/payout')
 @with_bank
 def attempt_payout(bank):
