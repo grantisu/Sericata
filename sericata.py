@@ -138,12 +138,13 @@ def make_stats_page(bank):
 def attempt_payout(bank):
     form = bottle.request.forms
     addr = form.get('addr')
+    e400 = "<h3>400 Bad Request</h3>"
     try:
         amt = bank.schedule_payment(addr)
     except ValueError:
-        return bottle.HTTPResponse(status = 400, body = "Bad address: "+addr)
+        return bottle.HTTPResponse(status = 400, body = e400+"Invalid address: "+addr)
     except DuplicateKeyError:
-        return bottle.HTTPResponse(status = 400, body = addr+" already queued")
+        return bottle.HTTPResponse(status = 400, body = e400+"Address "+addr+" already queued")
 
     return bottle.template('payout', amount=amt, address=addr)
 
