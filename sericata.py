@@ -126,37 +126,12 @@ def make_payments(bank):
 @bottle.get('/')
 @with_bank
 def make_main_page(bank):
-    return """
-Donation address is: {}
-<br>
-Current payout is: {}
-<br>
-<form action="/payout" method="post">
-  Address: <input name="addr" type="text" />
-  <input value="payout" type="Submit">
-</form>
-""".format(bank.public_address, bank.get_current_payout())
+    return bottle.template('main', **bank.get_public_status())
 
 @bottle.get('/stats')
 @with_bank
 def make_stats_page(bank):
-    return """
-Donation address is: {current_address}
-<br>
-Available funds are: {current_funds}
-<br>
-Current payout is: {current_payout}
-<br>
-Total pending payouts are: {next_payout_total}
-<br>
-Total pay periods elapsed: {total_pay_periods}
-<br>
-Last payout was on {last_payout_time} for {last_payout_total}
-<br>
-Next payout will be at {next_payout_time} for {next_payout_total}
-<br>
-Current server time is {current_time}
-""".format(**bank.get_public_status())
+    return bottle.template('stats', **bank.get_public_status())
 
 @bottle.post('/payout')
 @with_bank
@@ -170,8 +145,7 @@ def attempt_payout(bank):
     except DuplicateKeyError:
         return bottle.HTTPResponse(status = 400, body = addr+" already queued")
 
-    return "Scheduled {} to {}".format(amt, addr)
-
+    return bottle.template('payout', amount=amt, address=addr)
 
 if __name__ == '__main__':
     app = bottle.default_app()
