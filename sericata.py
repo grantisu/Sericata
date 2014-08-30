@@ -2,6 +2,12 @@ from gevent import Greenlet, monkey, core; monkey.patch_all()
 
 import bottle, jsonrpc, sys
 
+try:
+    from recaptcha.client import captcha
+except ImportError:
+    captcha = None
+
+
 class DuplicateKeyError(Exception):
     pass
 
@@ -35,11 +41,14 @@ class CoinBank(object):
         }.get(self.public_address[0], ('UNK', '?'))
 
         if 'sericata.recaptcha_pub' in config:
-            self.recaptcha_pub_key =  config['sericata.recaptcha_pub']
-            self.recaptcha_priv_key = config['sericata.recaptcha_priv']
+            if captcha:
+                self.captcha_html =  captcha.displayhtml(config['sericata.recaptcha_pub'])
+                self.captcha_priv_key = config['sericata.recaptcha_priv']
+            else:
+                raise Exception("Can't use api keys: failed to import from recaptcha.client")
         else:
-            self.recaptcha_pub_key =  None
-            self.recaptcha_priv_key = None
+            self.captcha_html =  ''
+            self.captcha_priv_key = None
 
     @property
     def balance(self):
@@ -97,7 +106,6 @@ class CoinBank(object):
             'current_time':      time,
             'next_payout_time':  self.last_pay_time + self.interval,
             'next_payout_total': self.get_total_pending(),
-            'recaptcha_pub_key': self.recaptcha_pub_key,
         }
 
     def schedule_payment(self, addr):
