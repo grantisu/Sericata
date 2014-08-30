@@ -34,6 +34,13 @@ class CoinBank(object):
             'n': ('test', u'\u0166'),
         }.get(self.public_address[0], ('UNK', '?'))
 
+        if 'sericata.recaptcha_pub' in config:
+            self.recaptcha_pub_key =  config['sericata.recaptcha_pub']
+            self.recaptcha_priv_key = config['sericata.recaptcha_priv']
+        else:
+            self.recaptcha_pub_key =  None
+            self.recaptcha_priv_key = None
+
     @property
     def balance(self):
         svc = None
@@ -90,6 +97,7 @@ class CoinBank(object):
             'current_time':      time,
             'next_payout_time':  self.last_pay_time + self.interval,
             'next_payout_total': self.get_total_pending(),
+            'recaptcha_pub_key': self.recaptcha_pub_key,
         }
 
     def schedule_payment(self, addr):
