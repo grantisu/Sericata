@@ -24,6 +24,16 @@ class CoinBank(object):
         self._public_address_stat = 0
         self._public_address = self.public_address
 
+        self.coin, self.symbol = {
+            '1': ('BTC',  u'\u0243'),
+            'L': ('LTC',  u'\u0141'),
+            'D': ('DOGE', u'\u0189'),
+            'N': ('NAME', u'\u2115'),
+            'P': ('PPC',  u'\u2C63'),
+            'm': ('test', u'\u0166'),
+            'n': ('test', u'\u0166'),
+        }.get(self.public_address[0], ('UNK', '?'))
+
     @property
     def balance(self):
         svc = None
@@ -68,6 +78,8 @@ class CoinBank(object):
         time = core.time()
         last_time, last_amt = self.paid[-1]
         return {
+            'coin':              self.coin,
+            'symbol':            self.symbol,
             'current_funds':     self.get_available(),
             'current_payout':    self.get_current_payout(),
             'last_payout_time':  last_time,
