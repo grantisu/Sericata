@@ -63,6 +63,23 @@ class CoinBank(object):
         '''This method should be greenthread-atomic'''
         return (len(self.paid), sum(self.pending.values()), self.pay_periods)
 
+    def get_public_status(self):
+
+        time = core.time()
+        last_time, last_amt = self.paid[-1]
+        return {
+            'current_funds':     self.get_available(),
+            'current_payout':    self.get_current_payout(),
+            'last_payout_time':  last_time,
+            'last_payout_total': last_amt,
+            'total_pay_periods': self.pay_periods,
+            'payout_interval':   self.interval,
+            'current_address':   self.public_address,
+            'current_time':      time,
+            'next_payout_time':  self.last_pay_time + self.interval,
+            'next_payout_total': self.get_total_pending(),
+        }
+
     def schedule_payment(self, addr):
         svc = self.get_proxy()
         if not svc.validateaddress(addr)['isvalid']:
