@@ -154,7 +154,11 @@ def make_payments(bank):
 @bottle.get('/')
 @with_bank
 def make_main_page(bank):
-    return bottle.template('main', **bank.get_public_status())
+    return bottle.template(
+        'main',
+        captcha_html = bank.captcha_html,
+        **bank.get_public_status()
+    )
 
 @bottle.get('/stats')
 @with_bank
@@ -167,6 +171,18 @@ def attempt_payout(bank):
     form = bottle.request.forms
     addr = form.get('addr')
     e400 = "<h3>400 Bad Request</h3>"
+    e403 = "<h3>403 Forbidden</h3>"
+
+    if captcha and bank.captcha_priv_key:
+        response = captcha.submit(
+            form.get('recaptcha_challenge_field'),
+            form.get('recaptcha_response_field'),
+            bank.captcha_priv_key,
+            bottle.request['REMOTE_ADDR'],
+        )
+        if not response.is_valid:
+            return bottle.HTTPResponse(status = 403, body = e403+"I think you're a robot! <a href='./'>Go back</a>")
+
     try:
         amt = bank.schedule_payment(addr)
     except ValueError:
