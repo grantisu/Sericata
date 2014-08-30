@@ -7,11 +7,11 @@ class DuplicateKeyError(Exception):
 
 class CoinBank(object):
     def __init__(self, config):
-        self.acct  = config['coinrpc.acct']
-        self.url   = config['coinrpc.url']
-        self.ratio = float(config['coinrpc.ratio'])
-        self.txfee = float(config['coinrpc.txfee'])
-        self.interval  = float(config['coinrpc.interval'])
+        self.acct      = config['sericata.acct']
+        self.url       = config['sericata.url']
+        self.ratio     = float(config['sericata.ratio'])
+        self.txfee     = float(config['sericata.txfee'])
+        self.interval  = float(config['sericata.interval'])
 
         self.pending = {}
         self.paid = [(0,0)]
@@ -81,10 +81,10 @@ class CoinBank(object):
         return amt
 
 def with_bank(orig_func):
-    '''Function decorator to provide coinrpc bank'''
+    '''Function decorator to provide CoinBank instance'''
     def wrapped_func(*arg, **kwarg):
         app = bottle.default_app()
-        bank = app.config['coinrpc.bank']
+        bank = app.config['sericata.bank']
         return orig_func(bank, *arg, **kwarg)
     return wrapped_func
 
@@ -170,20 +170,20 @@ if __name__ == '__main__':
     try:
         conf_file = sys.argv[1]
     except IndexError:
-        conf_file = 'coin.conf'
+        conf_file = 'sericata.conf'
 
     config = app.config.load_config(conf_file)
 
     url = 'http://%s:%s@%s:%s' % (
-        config['coinrpc.user'],
-        config['coinrpc.pass'],
-        config['coinrpc.host'],
-        config['coinrpc.port'],
+        config['sericata.user'],
+        config['sericata.pass'],
+        config['sericata.host'],
+        config['sericata.port'],
     )
-    config['coinrpc.url'] = url
+    config['sericata.url'] = url
 
     bank = CoinBank(config)
-    config['coinrpc.bank'] = bank
+    config['sericata.bank'] = bank
 
     # GeventServer is more fragile than the default WSGIRefServer: extra
     # arguments must be filtered out of config
