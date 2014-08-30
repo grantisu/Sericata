@@ -1,4 +1,4 @@
 % rebase('base.tpl', title='Payout')
 
-Scheduled payment of {{amount}} to {{address}}
+Scheduled payment of {{symbol}}{{amount}} to {{address}}
 

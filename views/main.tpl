@@ -2,7 +2,7 @@
 
 Donation address is: {{current_address}}
 <br>
-Current payout is: {{current_payout}}
+Current payout is: {{symbol}}{{current_payout}}
 <br>
 <form action="/payout" method="post">
   Address: <input name="addr" type="text" />

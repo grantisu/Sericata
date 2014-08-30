@@ -158,7 +158,7 @@ def attempt_payout(bank):
     except DuplicateKeyError:
         return bottle.HTTPResponse(status = 400, body = e400+"Address "+addr+" already queued")
 
-    return bottle.template('payout', amount=amt, address=addr)
+    return bottle.template('payout', amount=amt, address=addr, symbol=bank.symbol)
 
 if __name__ == '__main__':
     app = bottle.default_app()
