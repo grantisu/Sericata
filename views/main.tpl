@@ -9,6 +9,6 @@ Address: <input name="addr" type="text" />
 
 {{!captcha_html}}
 
-<input value="payout" type="Submit">
+<input value="payout" type="Submit" {{current_payout and ' ' or 'disabled'}}>
 </form>
 
