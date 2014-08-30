@@ -140,32 +140,23 @@ Current payout is: {}
 @bottle.get('/stats')
 @with_bank
 def make_stats_page(bank):
-    last_time, last_amt = bank.paid[-1]
-    next_time = bank.last_pay_time + bank.interval
     return """
-Donation address is: {}
+Donation address is: {current_address}
 <br>
-Available funds are: {}
+Available funds are: {current_funds}
 <br>
-Current payout is: {}
+Current payout is: {current_payout}
 <br>
-Total pending payouts are: {}
+Total pending payouts are: {next_payout_total}
 <br>
-Total pay periods elapsed: {}
+Total pay periods elapsed: {total_pay_periods}
 <br>
-Last payout was on {} for {}
+Last payout was on {last_payout_time} for {last_payout_total}
 <br>
-Next payout will be in {} seconds
-""".format(
-    bank.public_address,
-    bank.get_available(),
-    bank.get_current_payout(),
-    bank.get_total_pending(),
-    bank.pay_periods,
-    last_time,
-    last_amt,
-    next_time - core.time(),
-)
+Next payout will be at {next_payout_time} for {next_payout_total}
+<br>
+Current server time is {current_time}
+""".format(**bank.get_public_status())
 
 @bottle.post('/payout')
 @with_bank
