@@ -122,7 +122,8 @@ class CoinBank(object):
             if pay_status == self.get_pay_status():
                 break
 
-        self.pending[addr] = amt
+        if amt > 0:
+            self.pending[addr] = amt
         return amt
 
 def with_bank(orig_func):
@@ -172,6 +173,7 @@ def attempt_payout(bank):
     addr = form.get('addr')
     e400 = "<h3>400 Bad Request</h3>"
     e403 = "<h3>403 Forbidden</h3>"
+    e595 = "<h3>595 Insufficient Funds</h3>"
 
     if captcha and bank.captcha_priv_key:
         response = captcha.submit(
@@ -189,6 +191,9 @@ def attempt_payout(bank):
         return bottle.HTTPResponse(status = 400, body = e400+"Invalid address: "+addr)
     except DuplicateKeyError:
         return bottle.HTTPResponse(status = 400, body = e400+"Address "+addr+" already queued")
+
+    if amt == 0:
+        return bottle.HTTPResponse(status = 595, body = e595+"Out of "+bank.coin)
 
     return bottle.template('payout', amount=amt, address=addr, symbol=bank.symbol)
 
