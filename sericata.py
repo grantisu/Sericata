@@ -1,6 +1,7 @@
 from gevent import Greenlet, monkey, core; monkey.patch_all()
 
 import bottle, jsonrpc, sys
+import logging, logging.config
 
 try:
     from recaptcha.client import captcha
@@ -18,6 +19,9 @@ class CoinBank(object):
         self.ratio     = float(config['faucet.ratio'])
         self.txfee     = float(config['faucet.txfee'])
         self.interval  = float(config['faucet.interval'])
+
+        logging.config.fileConfig(config['logging.config_file'])
+        self.log = logging.getLogger('CoinBank')
 
         self.pending = {}
         self.paid = [(0,0)]
