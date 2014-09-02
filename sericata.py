@@ -36,8 +36,8 @@ class CoinBank(object):
             'D': ('DOGE', u'\u0189'),
             'N': ('NAME', u'\u2115'),
             'P': ('PPC',  u'\u2C63'),
-            'm': ('test', u'\u0166'),
-            'n': ('test', u'\u0166'),
+            'm': ('test-coin', u'\u0166'),
+            'n': ('test-coin', u'\u0166'),
         }.get(self.public_address[0], ('UNK', '?'))
 
         if 'sericata.recaptcha_pub' in config:
