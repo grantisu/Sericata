@@ -54,6 +54,8 @@ class CoinBank(object):
             self.captcha_html =  ''
             self.captcha_priv_key = None
 
+        self.log.info('Started new CoinBank instance (%s)', self.coin)
+
     @property
     def balance(self):
         svc = None
@@ -128,6 +130,9 @@ class CoinBank(object):
 
         if amt > 0:
             self.pending[addr] = amt
+            self.log.info('Scheduled payment of %f to %s', amt, addr)
+        else:
+            self.log.warning('Attempted to schedule a payment with zero funds')
         return amt
 
 def with_bank(orig_func):
@@ -147,6 +152,7 @@ def make_payments(bank):
     Greenlet.spawn_later(bank.interval, globals()['make_payments'])
 
     if amt == 0:
+        bank.log.debug('Payment period ended with no scheduled payments')
         return False
 
     svc = bank.get_proxy()
@@ -155,6 +161,8 @@ def make_payments(bank):
     bank.paid += [(core.time(), amt)]
 
     svc.sendmany(bank.acct, to_pay)
+    vals = to_pay.values()
+    bank.log.info('Made payments totalling %f to %d addresses', sum(vals), len(vals))
 
 @bottle.get('/')
 @with_bank
