@@ -13,11 +13,11 @@ class DuplicateKeyError(Exception):
 
 class CoinBank(object):
     def __init__(self, config):
-        self.acct      = config['sericata.acct']
-        self.url       = config['sericata.url']
-        self.ratio     = float(config['sericata.ratio'])
-        self.txfee     = float(config['sericata.txfee'])
-        self.interval  = float(config['sericata.interval'])
+        self.url       = config['rpc.url']
+        self.acct      = config['faucet.acct']
+        self.ratio     = float(config['faucet.ratio'])
+        self.txfee     = float(config['faucet.txfee'])
+        self.interval  = float(config['faucet.interval'])
 
         self.pending = {}
         self.paid = [(0,0)]
@@ -40,10 +40,10 @@ class CoinBank(object):
             'n': ('test-coin', u'\u0166'),
         }.get(self.public_address[0], ('UNK', '?'))
 
-        if 'sericata.recaptcha_pub' in config:
+        if 'recaptcha.pub_key' in config:
             if captcha:
-                self.captcha_html =  captcha.displayhtml(config['sericata.recaptcha_pub'])
-                self.captcha_priv_key = config['sericata.recaptcha_priv']
+                self.captcha_html =  captcha.displayhtml(config['recaptcha.pub_key'])
+                self.captcha_priv_key = config['recaptcha.priv_key']
             else:
                 raise Exception("Can't use api keys: failed to import from recaptcha.client")
         else:
@@ -207,12 +207,12 @@ if __name__ == '__main__':
     config = app.config.load_config(conf_file)
 
     url = 'http://%s:%s@%s:%s' % (
-        config['sericata.user'],
-        config['sericata.pass'],
-        config['sericata.host'],
-        config['sericata.port'],
+        config['rpc.user'],
+        config['rpc.pass'],
+        config['rpc.host'],
+        config['rpc.port'],
     )
-    config['sericata.url'] = url
+    config['rpc.url'] = url
 
     bank = CoinBank(config)
     config['sericata.bank'] = bank
