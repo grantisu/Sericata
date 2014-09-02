@@ -19,6 +19,8 @@ class CoinBank(object):
         self.ratio     = float(config['faucet.ratio'])
         self.txfee     = float(config['faucet.txfee'])
         self.interval  = float(config['faucet.interval'])
+        self.qr_path   = config['qrcode.path']
+        self.qr_file   = config['qrcode.file']
 
         logging.config.fileConfig(config['logging.config_file'])
         self.log = logging.getLogger('CoinBank')
@@ -177,6 +179,11 @@ def make_main_page(bank):
 @with_bank
 def make_stats_page(bank):
     return bottle.template('stats', **bank.get_public_status())
+
+@bottle.get('/donate.png')
+@with_bank
+def show_donate(bank):
+    return bottle.static_file(bank.qr_file, bank.qr_path)
 
 @bottle.post('/payout')
 @with_bank
