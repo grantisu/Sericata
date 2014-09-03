@@ -186,7 +186,7 @@ def http_err(code, body):
 
     return bottle.HTTPResponse(
         status = code,
-        body = '<h3>%d %s</h3>\n%s' % (code, code_map[code], body)
+        body = '<h3>%d %s</h3>\n%s<p><a href="./">Go Back</a>' % (code, code_map[code], body)
     )
 
 @bottle.get('/')
@@ -230,7 +230,7 @@ def attempt_payout(bank):
             bottle.request['REMOTE_ADDR'],
         )
         if not response.is_valid:
-            return http_err(403, "I think you're a robot! <a href='./'>Go back</a>")
+            return http_err(403, "I think you're a robot!")
 
     try:
         amt = bank.schedule_payment(addr)
