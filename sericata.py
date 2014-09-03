@@ -23,6 +23,7 @@ class CoinBank(object):
         self.ratio     = float(config['faucet.ratio'])
         self.txfee     = float(config['faucet.txfee'])
         self.interval  = float(config['faucet.interval'])
+        self.max_pay   = float(config['faucet.max_payout'])
         self.qr_regen  = config['qrcode.generate']
         self.qr_path   = config['qrcode.path']
         self.qr_file   = config['qrcode.file']
@@ -101,7 +102,7 @@ class CoinBank(object):
         return net
 
     def get_current_payout(self):
-        return min(self.ratio * self.get_available(), 1000)
+        return min(self.ratio * self.get_available(), self.max_pay)
 
     def get_pay_status(self):
         '''This method should be greenthread-atomic'''
