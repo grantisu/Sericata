@@ -177,6 +177,18 @@ def make_payments(bank):
     vals = to_pay.values()
     bank.log.info('Made payments totalling %f to %d addresses', sum(vals), len(vals))
 
+def http_err(code, body):
+    code_map = {
+        400: 'Bad Request',
+        403: 'Forbidden',
+        595: 'Insufficient Funds',
+    }
+
+    return bottle.HTTPResponse(
+        status = code,
+        body = '<h3>%d %s</h3>\n%s' % (code, code_map[code], body)
+    )
+
 @bottle.get('/')
 @with_bank
 def make_main_page(bank):
@@ -209,9 +221,6 @@ def show_style():
 def attempt_payout(bank):
     form = bottle.request.forms
     addr = form.get('addr')
-    e400 = "<h3>400 Bad Request</h3>"
-    e403 = "<h3>403 Forbidden</h3>"
-    e595 = "<h3>595 Insufficient Funds</h3>"
 
     if captcha and bank.captcha_priv_key:
         response = captcha.submit(
@@ -221,17 +230,17 @@ def attempt_payout(bank):
             bottle.request['REMOTE_ADDR'],
         )
         if not response.is_valid:
-            return bottle.HTTPResponse(status = 403, body = e403+"I think you're a robot! <a href='./'>Go back</a>")
+            return http_err(403, "I think you're a robot! <a href='./'>Go back</a>")
 
     try:
         amt = bank.schedule_payment(addr)
     except ValueError:
-        return bottle.HTTPResponse(status = 400, body = e400+"Invalid address: "+addr)
+        return http_err(400, "Invalid address: "+addr)
     except DuplicateKeyError:
-        return bottle.HTTPResponse(status = 400, body = e400+"Address "+addr+" already queued")
+        return http_err(400, "Address "+addr+" already queued")
 
     if amt == 0:
-        return bottle.HTTPResponse(status = 595, body = e595+"Out of "+bank.coin)
+        return http_err(595, "Out of "+bank.coin)
 
     return bottle.template('payout', amount=amt, address=addr, **bank.get_public_status())
 
