@@ -2,7 +2,7 @@
 
 <h3>Sericata Stats Page</h3>
 
-<dl>
+<dl class='stats'>
 <dt>Available funds</dt>
 <dd>{{symbol}}{{current_funds}}</dd>
 <dt>Current payout</dt>

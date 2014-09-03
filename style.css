@@ -1,4 +1,13 @@
+html {
+	padding: 2em;
+}
+
 body {
 	max-width: 50em;
 	margin: 3em auto;
 }
+
+dl.stats dt:after {
+	content: ':';
+}
+
