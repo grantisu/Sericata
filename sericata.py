@@ -8,6 +8,10 @@ try:
 except ImportError:
     captcha = None
 
+try:
+    import qrcode
+except ImportError:
+    qrcode = None
 
 class DuplicateKeyError(Exception):
     pass
@@ -19,6 +23,7 @@ class CoinBank(object):
         self.ratio     = float(config['faucet.ratio'])
         self.txfee     = float(config['faucet.txfee'])
         self.interval  = float(config['faucet.interval'])
+        self.qr_regen  = config['qrcode.generate']
         self.qr_path   = config['qrcode.path']
         self.qr_file   = config['qrcode.file']
 
@@ -76,6 +81,11 @@ class CoinBank(object):
                 svc = self.get_proxy()
             self._public_address_stat = self.get_pay_status()
             self._public_address = svc.getaccountaddress(self.acct)
+            if self.qr_regen:
+                qr = qrcode.QRCode()
+                qr.add_data(self._public_address)
+                qr_img = qr.make_image()
+                qr_img.save(self.qr_path + '/' + self.qr_file)
         return self._public_address
 
     def get_proxy(self):
