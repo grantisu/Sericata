@@ -1,6 +1,6 @@
 from gevent import Greenlet, monkey, core; monkey.patch_all()
 
-import bottle, jsonrpc, sys
+import bottle, bitcoinrpc.authproxy, sys
 import logging, logging.config
 
 try:
@@ -90,7 +90,7 @@ class CoinBank(object):
         return self._public_address
 
     def get_proxy(self):
-        return jsonrpc.ServiceProxy(self.url)
+        return bitcoinrpc.authproxy.AuthServiceProxy(self.url)
 
     def get_total_pending(self):
         return sum(self.pending.values())
