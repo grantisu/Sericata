@@ -224,7 +224,7 @@ def attempt_payout(bank):
     if amt == 0:
         return bottle.HTTPResponse(status = 595, body = e595+"Out of "+bank.coin)
 
-    return bottle.template('payout', amount=amt, address=addr, symbol=bank.symbol)
+    return bottle.template('payout', amount=amt, address=addr, **bank.get_public_status())
 
 if __name__ == '__main__':
     app = bottle.default_app()

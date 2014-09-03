@@ -10,5 +10,6 @@
 <li><a href="./">Main</a></li>
 <li><a href="./stats">Stats</a></li>
 </ul>
+Donate: <a href="./donate.png">{{current_address}}</a>
 </body>
 </html>
