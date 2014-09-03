@@ -1,0 +1,9 @@
+Pillow==2.5.3
+bottle==0.12.7
+gevent==1.0.1
+greenlet==0.4.3
+python-bitcoinrpc==0.1
+qrcode==5.0.1
+recaptcha-client==1.0.6
+six==1.7.3
+wsgiref==0.1.2
