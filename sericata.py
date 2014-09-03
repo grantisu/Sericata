@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from gevent import Greenlet, monkey, core; monkey.patch_all()
 
 import bottle, bitcoinrpc.authproxy, sys
