@@ -2,8 +2,6 @@
 
 <h3>Sericata Stats Page</h3>
 
-Donation address is: {{current_address}}
-<br>
 Available funds are: {{symbol}}{{current_funds}}
 <br>
 Current payout is: {{symbol}}{{current_payout}}

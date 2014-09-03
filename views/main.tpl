@@ -6,8 +6,6 @@ Welcome, help yourself to some {{coin}}.
 <p>
 Current payout is: {{symbol}}{{current_payout}}
 <br>
-Donation address is: {{current_address}}
-<br>
 <form action="/payout" method="post">
 Address: <input name="addr" type="text" />
 
