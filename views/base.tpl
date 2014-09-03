@@ -1,8 +1,9 @@
 <html>
 <head>
   <title>{{ "Sericata" + (title and " - "+title or "") }}</title>
+  <link rel="stylesheet" type="text/css" href="./style.css">
 </head>
-<body style="max-width: 50em; margin: 3em auto;">
+<body>
 {{!base}}
 
 <div>

@@ -196,6 +196,14 @@ def make_stats_page(bank):
 def show_donate(bank):
     return bottle.static_file(bank.qr_file, bank.qr_path)
 
+@bottle.get('/style.css')
+def show_style():
+    app = bottle.default_app()
+    return bottle.static_file(
+        app.config['style.file'],
+        app.config['style.path'],
+    )
+
 @bottle.post('/payout')
 @with_bank
 def attempt_payout(bank):
