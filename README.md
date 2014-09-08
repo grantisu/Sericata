@@ -9,7 +9,7 @@ Usage
 
 Set up your [virtualenv](
 http://docs.python-guide.org/en/latest/dev/virtualenvs/ ) with Python 2, and
-run `pip -r requirements.txt` to install dependencies.
+run `pip install -r requirements.txt` to install dependencies.
 
 Install and configure your [client]( https://en.bitcoin.it/wiki/Bitcoind ) to
 support RPC.
