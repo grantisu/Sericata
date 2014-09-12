@@ -2,12 +2,14 @@
 
 <h1>Sericata Faucet</h1>
 
+<div id="main_text">
 Welcome, help yourself to some {{coin}}.
 <p>
 Current payout is: {{symbol}}{{current_payout}}
-<br>
-<form action="/payout" method="post">
-Address: <input name="addr" type="text" />
+</div>
+<form id="main_form" action="/payout" method="post">
+<label for="addr">Address</label>
+<input name="addr" id="addr" type="text">
 
 {{!captcha_html}}
 
