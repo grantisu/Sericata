@@ -1,6 +1,6 @@
 % rebase('base.tpl', title='Stats')
 
-<h3>Sericata Stats Page</h3>
+<h1>Sericata Stats Page</h1>
 
 <dl class='stats'>
 <dt>Available funds</dt>

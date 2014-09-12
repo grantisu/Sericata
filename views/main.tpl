@@ -1,6 +1,6 @@
 % rebase('base.tpl', title='')
 
-<h3>Sericata Faucet</h3>
+<h1>Sericata Faucet</h1>
 
 Welcome, help yourself to some {{coin}}.
 <p>

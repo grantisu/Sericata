@@ -188,7 +188,7 @@ def http_err(code, body):
 
     return bottle.HTTPResponse(
         status = code,
-        body = '<h3>%d %s</h3>\n%s<p><a href="./">Go Back</a>' % (code, code_map[code], body)
+        body = '<h1>%d %s</h1>\n%s<p><a href="./">Go Back</a>' % (code, code_map[code], body)
     )
 
 @bottle.get('/')

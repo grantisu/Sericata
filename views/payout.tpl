@@ -1,6 +1,6 @@
 % rebase('base.tpl', title='Payout')
 
-<h3>Success!</h3>
+<h1>Success!</h1>
 
 Scheduled payment of {{symbol}}{{amount}} to {{address}}
 
