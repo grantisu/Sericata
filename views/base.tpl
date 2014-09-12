@@ -7,11 +7,13 @@
 <body>
 {{!base}}
 
-<div>
-<ul>
+<div id="footer">
+<ul id="menu">
 <li><a href="./">Main</a></li>
 <li><a href="./stats">Stats</a></li>
 </ul>
-Donate: <a href="./donate.png">{{current_address}}</a>
+<span id="donate">Donate: <a href="./donate.png">{{current_address}}</a></span>
+</div>
+
 </body>
 </html>
