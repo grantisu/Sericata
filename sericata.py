@@ -38,6 +38,7 @@ class CoinBank(object):
         self.qr_regen  = c_bool(config['qrcode.generate'])
         self.qr_path   = config['qrcode.path']
         self.qr_file   = config['qrcode.file']
+        self.reuse_addr = c_bool(config['faucet.reuse_addr'])
 
         logging.config.fileConfig(config['logging.config_file'])
         self.log = logging.getLogger('CoinBank')
@@ -93,16 +94,17 @@ class CoinBank(object):
     @property
     def public_address(self):
         svc = None
-        while self._public_address_stat != self.get_pay_status():
-            if svc is None:
-                svc = self.get_proxy()
-            self._public_address_stat = self.get_pay_status()
-            self._public_address = svc.getaccountaddress(self.acct)
-            if self.qr_regen:
-                qr = qrcode.QRCode()
-                qr.add_data(self._public_address)
-                qr_img = qr.make_image()
-                qr_img.save(self.qr_path + '/' + self.qr_file)
+        if not (self.reuse_addr and self._public_address_stat):
+            while self._public_address_stat != self.get_pay_status():
+                if svc is None:
+                    svc = self.get_proxy()
+                self._public_address_stat = self.get_pay_status()
+                self._public_address = svc.getaccountaddress(self.acct)
+                if self.qr_regen:
+                    qr = qrcode.QRCode()
+                    qr.add_data(self._public_address)
+                    qr_img = qr.make_image()
+                    qr_img.save(self.qr_path + '/' + self.qr_file)
         return self._public_address
 
     @property
