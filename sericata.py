@@ -18,6 +18,15 @@ except ImportError:
 class DuplicateKeyError(Exception):
     pass
 
+def c_bool(orig):
+    '''Convert a config value to a boolean value, or die trying'''
+    norm = orig.lower().strip()
+    if norm in ('yes', 'y', 'true', 't', '1'):
+        return True
+    if norm in ('no', 'n', 'false', 'f', '0'):
+        return False
+    raise TypeError
+
 class CoinBank(object):
     def __init__(self, config):
         self.url       = config['rpc.url']
@@ -26,7 +35,7 @@ class CoinBank(object):
         self.txfee     = float(config['faucet.txfee'])
         self.interval  = float(config['faucet.interval'])
         self.max_pay   = float(config['faucet.max_payout'])
-        self.qr_regen  = config['qrcode.generate']
+        self.qr_regen  = c_bool(config['qrcode.generate'])
         self.qr_path   = config['qrcode.path']
         self.qr_file   = config['qrcode.file']
 
