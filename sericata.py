@@ -2,7 +2,7 @@
 
 from gevent import Greenlet, monkey, core; monkey.patch_all()
 
-import bottle, bitcoinrpc.authproxy, sys
+import bottle, bitcoinrpc.authproxy, math, sys
 import logging, logging.config
 
 try:
@@ -67,6 +67,8 @@ class CoinBank(object):
             self.captcha_html =  ''
             self.captcha_priv_key = None
 
+        self.get_proxy().settxfee(self.txfee)
+
         self.log.info('Started new CoinBank instance (%s)', self.coin)
 
     @property
@@ -104,6 +106,15 @@ class CoinBank(object):
             self._all_addresses = svc.getaddressesbyaccount(self.acct)
         return self._all_addresses
 
+    def get_total_tx_fee(self, ins=None, outs=None):
+        '''Estimate the transaction fee given the number of inputs and outputs'''
+        if ins is None:
+            ins = len(self.all_addresses)
+        if outs is None:
+            outs = len(self.pending)
+        sz = ins*149 + outs*34 + 10
+        return math.ceil(sz / 1024.0) * self.txfee
+
     def get_proxy(self):
         return bitcoinrpc.authproxy.AuthServiceProxy(self.url)
 
@@ -111,7 +122,7 @@ class CoinBank(object):
         return sum(self.pending.values())
 
     def get_available(self):
-        net = self.balance - self.get_total_pending() - self.txfee
+        net = self.balance - self.get_total_pending() - self.get_total_tx_fee()
         if net < 0:
             net = 0
         return net
