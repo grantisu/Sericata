@@ -1,25 +1,26 @@
 Sericata
 ========
 
-Sericata as a simple Bitcoin/Litecoin/Dogecoin/etc. faucet written in Python.
+Sericata is a simple Bitcoin/Litecoin/Dogecoin/etc. faucet written in Python.
 
 
 Usage
 -----
 
-Set up your [virtualenv](
-http://docs.python-guide.org/en/latest/dev/virtualenvs/ ) with Python 2, and
-run `pip install -r requirements.txt` to install dependencies.
+- Set up a [virtualenv](
+  http://docs.python-guide.org/en/latest/dev/virtualenvs/ ) with Python 2.7
 
-Install and configure your [client]( https://en.bitcoin.it/wiki/Bitcoind ) to
-support RPC.
+- Run `pip install -r requirements.txt` to install dependencies.
 
-Edit sericata.conf with your RPC credentials, desired faucet parameters, etc.
-You may also want to edit logging.conf, e.g. to talk to syslog.
+- Install and configure a [client]( https://en.bitcoin.it/wiki/Bitcoind ) to
+  support RPC.
 
-Edit style.css and the templates to make things look pretty.
+- Edit sericata.conf with your RPC credentials, desired faucet parameters, etc.
+  You may also want to edit logging.conf, e.g. to talk to syslog.
 
-Run `./sericata.py`
+- Edit style.css and the templates to make things look pretty.
+
+- Run `./sericata.py`
 
 
 About
