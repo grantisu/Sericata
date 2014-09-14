@@ -38,7 +38,19 @@ class CoinBank(object):
         self.qr_regen  = c_bool(config['qrcode.generate'])
         self.qr_path   = config['qrcode.path']
         self.qr_file   = config['qrcode.file']
-        self.reuse_addr = c_bool(config['faucet.reuse_addr'])
+
+        svc = self.get_proxy()
+
+        try:
+            reuse_addr = config['faucet.reuse_addr']
+            self.reuse_addr = c_bool(reuse_addr)
+            self._public_address = False
+        except TypeError:
+            self.reuse_addr = True
+            if svc.validateaddress(reuse_addr)['isvalid']:
+                self._public_address = reuse_addr
+            else:
+                raise ValueError
 
         logging.config.fileConfig(config['logging.config_file'])
         self.log = logging.getLogger('CoinBank')
@@ -77,7 +89,7 @@ class CoinBank(object):
             self.captcha_html =  ''
             self.captcha_priv_key = None
 
-        self.get_proxy().settxfee(self.txfee)
+        svc.settxfee(self.txfee)
 
         self.log.info('Started new CoinBank instance (%s)', self.coin)
 
@@ -94,7 +106,7 @@ class CoinBank(object):
     @property
     def public_address(self):
         svc = None
-        if not (self.reuse_addr and self._public_address_stat):
+        if not (self.reuse_addr and self._public_address):
             while self._public_address_stat != self.get_pay_status():
                 if svc is None:
                     svc = self.get_proxy()
