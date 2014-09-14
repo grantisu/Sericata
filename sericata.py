@@ -44,6 +44,9 @@ class CoinBank(object):
         self._public_address_stat = 0
         self._public_address = self.public_address
 
+        self._all_addresses_stat = 0
+        self._all_addresses = self.all_addresses
+
         self.coin, self.symbol = {
             '1': ('BTC',  u'\u0243'),
             'L': ('LTC',  u'\u0141'),
@@ -90,6 +93,16 @@ class CoinBank(object):
                 qr_img = qr.make_image()
                 qr_img.save(self.qr_path + '/' + self.qr_file)
         return self._public_address
+
+    @property
+    def all_addresses(self):
+        svc = None
+        while self._all_addresses_stat != self.get_pay_status():
+            if svc is None:
+                svc = self.get_proxy()
+            self._all_addresses_stat = self.get_pay_status()
+            self._all_addresses = svc.getaddressesbyaccount(self.acct)
+        return self._all_addresses
 
     def get_proxy(self):
         return bitcoinrpc.authproxy.AuthServiceProxy(self.url)
