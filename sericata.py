@@ -122,7 +122,8 @@ class CoinBank(object):
         return sum(self.pending.values())
 
     def get_available(self):
-        net = self.balance - self.get_total_pending() - self.get_total_tx_fee()
+        adj_outs = len(self.pending) + 1
+        net = self.balance - self.get_total_pending() - self.get_total_tx_fee(outs=adj_outs)
         if net < 0:
             net = 0
         return net
