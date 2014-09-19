@@ -11,3 +11,19 @@ dl.stats dt:after {
 	content: ':';
 }
 
+#footer {
+	margin: 2em auto;
+}
+
+#menu a {
+	padding: 0.667em 1.5em;
+	font-size: 110%;
+	text-decoration: none;
+}
+
+#menu li {
+	margin: 0.667em 1.5em;
+	outline: 1px solid #000;
+	display: inline-block;
+}
+
