@@ -186,7 +186,7 @@ class CoinBank(object):
         if not svc.validateaddress(addr)['isvalid']:
             raise ValueError
         if addr in self.pending:
-            raise DuplicateKeyError
+            raise DuplicateKeyError('address', addr)
 
         while 1:
             pay_status = self.get_pay_status()
@@ -290,8 +290,9 @@ def attempt_payout(bank):
         amt = bank.schedule_payment(addr)
     except ValueError:
         return http_err(400, "Invalid address: "+addr)
-    except DuplicateKeyError:
-        return http_err(400, "Address "+addr+" already queued")
+    except DuplicateKeyError as e:
+        t, v = e.args
+        return http_err(400, t+" ("+v+") already queued")
 
     if amt == 0:
         return http_err(595, "Out of "+bank.coin)
