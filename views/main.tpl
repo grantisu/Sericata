@@ -13,6 +13,6 @@ Current payout is: {{symbol}}{{current_payout}}
 
 {{!captcha_html}}
 
-<input value="payout" type="Submit" {{current_payout and ' ' or 'disabled'}}>
+<input id="pay_button" value="Payout" type="Submit" {{current_payout and ' ' or 'disabled'}}>
 </form>
 

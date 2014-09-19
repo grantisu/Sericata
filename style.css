@@ -11,6 +11,22 @@ dl.stats dt:after {
 	content: ':';
 }
 
+#main_text {
+	margin: 2em 0.5em;
+}
+
+#addr {
+	margin: 0.5em 0 2.5em 0;
+	width: 25em;
+	display: block;
+}
+
+#pay_button {
+	font-size: 120%;
+	width: 5em;
+	margin: 1.5em 6em;
+}
+
 #footer {
 	margin: 2em auto;
 }
