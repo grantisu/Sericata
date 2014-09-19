@@ -7,8 +7,6 @@
 <dd>{{symbol}}{{current_funds}}</dd>
 <dt>Current payout</dt>
 <dd>{{symbol}}{{current_payout}}</dd>
-<dt>Total pending payouts</dt>
-<dd>{{symbol}}{{next_payout_total}}</dd>
 <dt>Total pay periods</dt>
 <dd>{{total_pay_periods}}</dd>
 <dt>Last payout</dt>
