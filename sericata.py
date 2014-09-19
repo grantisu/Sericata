@@ -66,8 +66,8 @@ class CoinBank(object):
         self._public_address_stat = 0
         self._public_address = self.public_address
 
-        self._all_addresses_stat = 0
-        self._all_addresses = self.all_addresses
+        self._utxo_count_stat = 0
+        self._utxo_count = self.utxo_count
 
         self.coin, self.symbol = {
             '1': ('BTC',  u'\u0243'),
@@ -120,19 +120,23 @@ class CoinBank(object):
         return self._public_address
 
     @property
-    def all_addresses(self):
+    def utxo_count(self):
         svc = None
-        while self._all_addresses_stat != self.get_pay_status():
+        while self._utxo_count_stat != self.get_pay_status():
             if svc is None:
                 svc = self.get_proxy()
-            self._all_addresses_stat = self.get_pay_status()
-            self._all_addresses = svc.getaddressesbyaccount(self.acct)
-        return self._all_addresses
+            self._utxo_count_stat = self.get_pay_status()
+            addrs = set(svc.getaddressesbyaccount(self.acct))
+            self._utxo_count = len([
+                1 for utxo in svc.listunspent(1)
+                if utxo['address'] in addrs
+            ])
+        return self._utxo_count
 
     def get_total_tx_fee(self, ins=None, outs=None):
         '''Estimate the transaction fee given the number of inputs and outputs'''
         if ins is None:
-            ins = len(self.all_addresses)
+            ins = self.utxo_count
         if outs is None:
             outs = len(self.pending)
         sz = ins*149 + outs*34 + 10
