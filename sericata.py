@@ -56,6 +56,7 @@ class CoinBank(object):
         self.log = logging.getLogger('CoinBank')
 
         self.pending = {}
+        self.ips = set()
         self.paid = [(0,0)]
         self.pay_periods = 0
         self.last_pay_time = core.time()
@@ -183,10 +184,13 @@ class CoinBank(object):
 
     def schedule_payment(self, addr):
         svc = self.get_proxy()
+        ip = bottle.request.remote_addr
         if not svc.validateaddress(addr)['isvalid']:
             raise ValueError
         if addr in self.pending:
             raise DuplicateKeyError('address', addr)
+        if ip in self.ips:
+            raise DuplicateKeyError('ip', ip)
 
         while 1:
             pay_status = self.get_pay_status()
@@ -197,6 +201,7 @@ class CoinBank(object):
 
         if amt > 0:
             self.pending[addr] = amt
+            self.ips.add(ip)
             self.log.info('Scheduled payment of %f to %s', amt, addr)
         else:
             self.log.warning('Attempted to schedule a payment with zero funds')
@@ -225,6 +230,7 @@ def make_payments(bank):
     svc = bank.get_proxy()
     to_pay = bank.pending
     bank.pending = {}
+    bank.ips = set()
     bank.paid += [(core.time(), amt)]
 
     svc.sendmany(bank.acct, to_pay)
