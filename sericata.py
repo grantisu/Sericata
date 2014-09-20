@@ -114,10 +114,7 @@ class CoinBank(object):
                 self._public_address_stat = self.get_pay_status()
                 self._public_address = svc.getaccountaddress(self.acct)
                 if self.qr_regen:
-                    qr = qrcode.QRCode()
-                    qr.add_data(self._public_address)
-                    qr_img = qr.make_image()
-                    qr_img.save(self.qr_path + '/' + self.qr_file)
+                    self.write_qr()
         return self._public_address
 
     @property
@@ -181,6 +178,13 @@ class CoinBank(object):
             'next_payout_time':  self.last_pay_time + self.interval,
             'next_payout_total': self.get_total_pending(),
         }
+
+    def write_qr(self):
+        self.log.debug('Updating QR to '+self._public_address)
+        qr = qrcode.QRCode()
+        qr.add_data(self._public_address)
+        qr_img = qr.make_image()
+        qr_img.save(self.qr_path + '/' + self.qr_file)
 
     def schedule_payment(self, addr):
         svc = self.get_proxy()
