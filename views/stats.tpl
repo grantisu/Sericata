@@ -21,7 +21,7 @@
 
 <script>
 
-var inc = 200; // msec
+var inc = 950; // msec
 var interval;
 
 var last_t = new Date(1000*{{last_payout_time}});
