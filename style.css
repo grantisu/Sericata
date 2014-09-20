@@ -1,5 +1,5 @@
 html {
-	padding: 2em;
+	margin: 2em;
 }
 
 body {
@@ -40,6 +40,7 @@ dl.stats dt:after {
 	padding: 0.667em 1.5em;
 	font-size: 110%;
 	text-decoration: none;
+	display: inline-block;
 }
 
 #menu li {
