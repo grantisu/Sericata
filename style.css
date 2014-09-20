@@ -1,6 +1,8 @@
 html {
 	background: url("/doge.png") top right / contain no-repeat #fff;
 	margin: 2em;
+	height: 100%;
+	max-height: 640px;
 }
 
 body {
@@ -50,6 +52,7 @@ dl.stats dt:after {
 }
 
 #menu li {
+	background: #fff;
 	margin: 0.667em 1.5em;
 	outline: 1px solid #000;
 	display: inline-block;
