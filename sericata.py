@@ -307,6 +307,11 @@ def show_style():
         app.config['style.path'],
     )
 
+@bottle.get('/doge.png')
+def show_doge():
+    app = bottle.default_app()
+    return bottle.static_file('doge.png', app.config['style.path'])
+
 @bottle.post('/payout')
 @with_bank
 def attempt_payout(bank):

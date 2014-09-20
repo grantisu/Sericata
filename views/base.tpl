@@ -16,6 +16,8 @@
 <span id="donate">Donate: <a href="./donate.png">{{current_address}}</a></span>
 <div id="attrib">
 &copy; <a href="http://www.gmathews.com">Grant Mathews</a> - <a href="https://github.com/grantisu/Sericata">source code</a>
+<br>
+Background logo originally by <a href="https://github.com/jdaverth/doge_assets">The_pun_fart</a>
 </div>
 
 </body>

@@ -1,10 +1,16 @@
 html {
+	background: url("/doge.png") top right / contain no-repeat #fff;
 	margin: 2em;
 }
 
 body {
 	max-width: 50em;
 	margin: 3em auto;
+	text-shadow:
+		-0.1em -0.1em 0.2em #fff,
+		 0.1em -0.1em 0.2em #fff,
+		-0.1em  0.1em 0.2em #fff,
+		 0.1em  0.1em 0.2em #fff;
 }
 
 dl.stats dt:after {
