@@ -29,6 +29,10 @@ def c_bool(orig):
 
 class CoinBank(object):
     def __init__(self, config):
+        logging.config.fileConfig(config['logging.config_file'])
+        self.log = logging.getLogger('CoinBank')
+        self.log.debug("Building new CoinBank instance")
+
         self.url       = config['rpc.url']
         self.acct      = config['faucet.acct']
         self.ratio     = float(config['faucet.ratio'])
@@ -51,9 +55,6 @@ class CoinBank(object):
                 self._public_address = reuse_addr
             else:
                 raise ValueError
-
-        logging.config.fileConfig(config['logging.config_file'])
-        self.log = logging.getLogger('CoinBank')
 
         self.pending = {}
         self.ips = set()
