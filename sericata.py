@@ -53,6 +53,8 @@ class CoinBank(object):
             self.reuse_addr = True
             if svc.validateaddress(reuse_addr)['isvalid']:
                 self._public_address = reuse_addr
+                if self.qr_regen:
+                    self.write_qr()
             else:
                 raise ValueError
 
