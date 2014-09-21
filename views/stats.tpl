@@ -24,9 +24,9 @@
 var inc = 950; // msec
 var interval;
 
-var last_t = new Date(1000*{{last_payout_time}});
-var next_t = {{next_payout_time}};
-var cur_t = {{current_time}};
+var last_t  = new Date(1000*{{last_payout_time}});
+var skew_ms = 1000*{{current_time}} - Date.now();
+var next_ms = 1000*{{next_payout_time}} + skew_ms;
 
 var last_n = document.getElementById('last_time');
 var next_n = document.getElementById('next_time');
@@ -36,14 +36,13 @@ last_n.innerHTML = last_t;
 cur_n.innerHTML = '';
 
 function update_times() {
-	s = Math.floor(1 + next_t - cur_t);
+	s = Math.floor(0.001*(next_ms - Date.now()) + 1);
 	if (s >= 0) {
 		next_n.innerHTML = 'in '+s+' sec';
 	} else {
 		window.clearInterval(interval);
 		location.reload(true)
 	}
-	cur_t += 0.001*inc;
 }
 
 update_times();
