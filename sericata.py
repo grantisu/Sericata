@@ -60,7 +60,7 @@ class CoinBank(object):
 
         self.pending = {}
         self.ips = set()
-        self.paid = [(0,0)]
+        self.paid = [(core.time(),0)]
         self.pay_periods = 0
         self.last_pay_time = core.time()
 
