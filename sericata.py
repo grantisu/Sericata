@@ -166,14 +166,18 @@ class CoinBank(object):
     def get_public_status(self):
 
         time = core.time()
+        start_time = self.paid[0][0]
         last_time, last_amt = self.paid[-1]
+        total_paid = sum(j for i, j in self.paid)
         return {
             'coin':              self.coin,
             'symbol':            self.symbol,
             'current_funds':     self.get_available(),
             'current_payout':    self.get_current_payout(),
+            'start_time':        start_time,
             'last_payout_time':  last_time,
             'last_payout_total': last_amt,
+            'total_pay_amount':  total_paid,
             'total_pay_periods': self.pay_periods,
             'payout_interval':   self.interval,
             'current_address':   self.public_address,
