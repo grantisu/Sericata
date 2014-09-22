@@ -2,8 +2,9 @@
 
 from gevent import Greenlet, monkey, core; monkey.patch_all()
 
-import bottle, bitcoinrpc.authproxy, math, sys
+import bottle, bitcoinrpc.authproxy, math, os, sys
 import logging, logging.config
+import cPickle as pickle
 
 try:
     from recaptcha.client import captcha
@@ -58,9 +59,21 @@ class CoinBank(object):
             else:
                 raise ValueError
 
+        self.paid = [(core.time(),0)]
+        try:
+            self.hist_file = config['faucet.history_file']
+            if os.path.isfile(self.hist_file):
+                try:
+                    with open(self.hist_file, 'rb') as pf:
+                        p = pickle.load(pf)
+                        self.paid = p
+                except EOFError:
+                    self.log.warn("Couldn't read history file: "+self.hist_file)
+        except KeyError:
+            self.hist_file = False
+
         self.pending = {}
         self.ips = set()
-        self.paid = [(core.time(),0)]
         self.pay_periods = 0
         self.last_pay_time = core.time()
 
@@ -243,6 +256,12 @@ def make_payments(bank):
     bank.pending = {}
     bank.ips = set()
     bank.paid += [(core.time(), amt)]
+    if bank.hist_file:
+        fn = bank.hist_file
+        if os.path.isfile(fn):
+            os.rename(fn, fn+'.bak')
+        with open(fn, 'wb') as pf:
+            pickle.dump(bank.paid, pf)
 
     svc.sendmany(bank.acct, to_pay)
     vals = to_pay.values()
