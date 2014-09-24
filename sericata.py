@@ -226,7 +226,7 @@ class CoinBank(object):
         if amt > 0:
             self.pending[addr] = amt
             self.ips.add(ip)
-            self.log.info('Scheduled payment of %f to %s', amt, addr)
+            self.log.info('Scheduled payment of %f to %s at %s', amt, addr, ip)
         else:
             self.log.warning('Attempted to schedule a payment with zero funds')
         return amt
