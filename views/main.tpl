@@ -6,6 +6,17 @@
 Welcome, help yourself to some {{coin}}.
 <p>
 Current payout is: {{symbol}}{{current_payout}}
+<p>
+Payouts made once every
+
+%if payout_interval > 3600:
+  {{int(payout_interval / 3600)}} hours
+%elif payout_interval > 60:
+  {{int(payout_interval / 60)}} minutes
+%else:
+  {{int(payout_interval)}} seconds
+%end
+
 </div>
 <form id="main_form" action="/payout" method="post">
 <label for="addr">Address</label>
