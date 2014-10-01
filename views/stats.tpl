@@ -28,7 +28,7 @@ var interval;
 
 var last_t  = new Date(1000*{{last_payout_time}});
 var skew_ms = 1000*{{current_time}} - Date.now();
-var next_ms = 1000*{{next_payout_time}} + skew_ms;
+var next_ms = 1000*{{next_payout_time}} - skew_ms;
 
 var last_n = document.getElementById('last_time');
 var next_n = document.getElementById('next_time');
