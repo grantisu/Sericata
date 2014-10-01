@@ -43,7 +43,7 @@ function update_times() {
 		next_n.innerHTML = 'in '+s+' sec';
 	} else {
 		window.clearInterval(interval);
-		location.reload(true)
+		location.assign('?auto-stats');
 	}
 }
 
