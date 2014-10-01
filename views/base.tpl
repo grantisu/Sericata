@@ -3,6 +3,7 @@
   <title>{{ "Sericata" + (title and " - "+title or "") }}</title>
   <link rel="stylesheet" type="text/css" href="./style.css">
   <meta name="viewport" content="width=device-width">
+  <meta http-equiv="refresh" content="600;URL='?auto'">
 </head>
 <body>
 {{!base}}
