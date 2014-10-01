@@ -211,10 +211,6 @@ class CoinBank(object):
         ip = bottle.request.remote_addr
         if not svc.validateaddress(addr)['isvalid']:
             raise ValueError
-        if addr in self.pending:
-            raise DuplicateKeyError('address', addr)
-        if ip in self.ips:
-            raise DuplicateKeyError('ip', ip)
 
         while 1:
             pay_status = self.get_pay_status()
@@ -222,6 +218,11 @@ class CoinBank(object):
             # Check to make sure nothing happened
             if pay_status == self.get_pay_status():
                 break
+
+        if addr in self.pending:
+            raise DuplicateKeyError('address', addr)
+        if ip in self.ips:
+            raise DuplicateKeyError('ip', ip)
 
         if amt > 0:
             self.pending[addr] = amt
